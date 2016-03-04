@@ -16,7 +16,7 @@ import org.apache.solr.common.SolrInputDocument;
 public class DBAccessor
 {
     private static int fetchSize = 1000;
-    private static String url = "http://localhost:8983/solr/core1/";
+    private static String url = "http://nadellas.sandbox.gspt.net:8983/solr/core1/";
     private static CommonsHttpSolrServer solrCore;
 
     public DBAccessor() throws MalformedURLException
