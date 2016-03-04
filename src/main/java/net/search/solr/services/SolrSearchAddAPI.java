@@ -1,6 +1,11 @@
 package net.search.solr.services;
 
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -11,30 +16,26 @@ public class SolrSearchAddAPI {
     @GET
     @Produces("application/xml")
     public String solrApi() {
-
-        Double fahrenheit = 98.24;
-        Double celsius = 36.8;
-        celsius = ((fahrenheit - 32) * 5) /9 ;
-//        fahrenheit = ((celsius * 9) / 5) + 32;
-
-        String result = "@Produces(\"application/xml\") Output: \n\nF to C Converter Output: \n\n" +
-                celsius;
-        return "<solrAddApi>" + "<fahrenheit>" + fahrenheit + "</fahrenheit>" + "<ftocoutput>" + result +
-                "</ftocoutput>" + "</solrAddApi>";
+        Class.forName("oracle.jdbc.driver.OracleDriver");
+        Statement stmt = null;
+        String query = "select COF_NAME, SUP_ID, PRICE, " +
+                       "SALES, TOTAL " +
+                       "from " + "dbName" + ".COFFEES";
+        Connection connection = null;
+        
+        connection = DriverManager.getConnection(
+                "jdbc:oracle:thin:@localhost:1521:mkyong", "username",
+                "password");
+        stmt = connection.createStatement();
+        ResultSet rs = stmt.executeQuery(query);
+        
+        return "<solrAddApi> <fahrenheit></fahrenheit><ftocoutput> </ftocoutput></solrAddApi>";
     }
 
     @Path("{f}")
     @GET
     @Produces("application/xml")
     public String solrApi(@PathParam("f") Double f) {
-        
-        Double fahrenheit = f;
-        Double celsius = 36.8;
-        celsius = ((fahrenheit - 32) * 5) /9 ;
-
-        String result = "@Produces(\"application/xml\") Output: \n\nF to C Converter Output From Input: \n\n" +
-                celsius;
-        return "<solrAddApi>" + "<fahrenheit>" + fahrenheit + "</fahrenheit>" + "<ftocoutput>" + result +
-                "</ftocoutput>" + "</solrAddApi>";
+        return "<solrAddApi> <fahrenheit></fahrenheit><ftocoutput> </ftocoutput></solrAddApi>";
     }
 }
