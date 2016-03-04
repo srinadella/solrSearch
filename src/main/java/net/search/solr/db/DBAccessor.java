@@ -1,4 +1,4 @@
-package net.sri.search.solr.db;
+package net.search.solr.db;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -10,18 +10,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 
 public class DBAccessor
 {
     private static int fetchSize = 1000;
     private static String url = "http://localhost:8983/solr/core1/";
-    private static HttpSolrServer solrCore;
+    private static CommonsHttpSolrServer solrCore;
 
     public DBAccessor() throws MalformedURLException
     {
-         solrCore = new HttpSolrServer(url);
+         solrCore = new CommonsHttpSolrServer(url);
     }
 
     /**

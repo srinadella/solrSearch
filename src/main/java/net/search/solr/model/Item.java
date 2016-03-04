@@ -1,4 +1,4 @@
-package net.sri.search.solr.model;
+package net.search.solr.model;
 
 import java.util.List;
 

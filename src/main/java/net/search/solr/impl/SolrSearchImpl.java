@@ -1,16 +1,15 @@
-package net.sri.search.solr.impl;
+package net.search.solr.impl;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sri.search.solr.model.Item;
-
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.impl.XMLResponseParser;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -18,6 +17,8 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+
+import net.search.solr.model.Item;
 
 public class SolrSearchImpl {
 
@@ -46,11 +47,17 @@ public class SolrSearchImpl {
         } catch (SolrServerException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
         try {
             beans = queryFacetSolr();
         } catch (SolrServerException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -60,11 +67,14 @@ public class SolrSearchImpl {
         } catch (SolrServerException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
     }
 
-    private static List<String> queryHighlightingSolr() throws SolrServerException {
+    private static List<String> queryHighlightingSolr() throws SolrServerException, MalformedURLException {
         SolrQuery query = new SolrQuery();
         query.setQuery("foo");
 
@@ -90,8 +100,8 @@ public class SolrSearchImpl {
 
     }
 
-    private static List<Item> queryFacetSolr() throws SolrServerException {
-        HttpSolrServer server = getSolrServer();
+    private static List<Item> queryFacetSolr() throws SolrServerException, MalformedURLException {
+        CommonsHttpSolrServer server = getSolrServer();
         SolrQuery solrQuery = new SolrQuery().
                 setQuery("ipod").
                 setFacet(true).
@@ -109,9 +119,9 @@ public class SolrSearchImpl {
 
     }
 
-    private static List<Item> querySimpleSolr() throws SolrServerException {
+    private static List<Item> querySimpleSolr() throws SolrServerException, MalformedURLException {
         // TODO Auto-generated method stub
-        HttpSolrServer server = getSolrServer();
+        CommonsHttpSolrServer server = getSolrServer();
 
         SolrQuery query = new SolrQuery();
         query.setQuery("*:*");
@@ -127,7 +137,7 @@ public class SolrSearchImpl {
     }
 
     private static void addObjectToSolr() throws IOException, SolrServerException {
-        HttpSolrServer server = getSolrServer();
+        CommonsHttpSolrServer server = getSolrServer();
         Item item = new Item();
         item.setId("one");
         item.setCategories(new String[] { "aaa", "bbb", "ccc" });
@@ -140,7 +150,7 @@ public class SolrSearchImpl {
     }
 
     private static void addDocumentToSolr() throws SolrServerException, IOException {
-        HttpSolrServer server = getSolrServer();
+        CommonsHttpSolrServer server = getSolrServer();
         SolrInputDocument doc1 = new SolrInputDocument();
         doc1.addField("id", "id1", 1.0f);
         doc1.addField("name", "doc1", 1.0f);
@@ -168,17 +178,18 @@ public class SolrSearchImpl {
 
     /**
      * @return
+     * @throws MalformedURLException 
      */
-    public static HttpSolrServer getSolrServer() {
+    public static CommonsHttpSolrServer getSolrServer() throws MalformedURLException {
         String url = "http://54.209.3.16:7574/solr/#/gettingstarted_shard2_replica2";
         /*
-         * HttpSolrServer is thread-safe and if you are using the following constructor,
+         * CommonsHttpSolrServer is thread-safe and if you are using the following constructor,
          * you *MUST* re-use the same instance for all requests. If instances are created on
          * the fly, it can cause a connection leak. The recommended practice is to keep a
-         * static instance of HttpSolrServer per solr server url and share it for all requests.
+         * static instance of CommonsHttpSolrServer per solr server url and share it for all requests.
          * See https://issues.apache.org/jira/browse/SOLR-861 for more details
          */
-        HttpSolrServer server = new HttpSolrServer(url);
+        CommonsHttpSolrServer server = new CommonsHttpSolrServer(url);
         server.setMaxRetries(1); // defaults to 0. > 1 not recommended.
         server.setConnectionTimeout(5000); // 5 seconds to establish TCP
         // Setting the XML response parser is only required for cross
