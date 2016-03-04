@@ -4,6 +4,7 @@ package net.search.solr.services;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.ws.rs.GET;
@@ -16,18 +17,27 @@ public class SolrSearchAddAPI {
     @GET
     @Produces("application/xml")
     public String solrApi() {
-        Class.forName("oracle.jdbc.driver.OracleDriver");
         Statement stmt = null;
         String query = "select COF_NAME, SUP_ID, PRICE, " +
                        "SALES, TOTAL " +
                        "from " + "dbName" + ".COFFEES";
         Connection connection = null;
         
-        connection = DriverManager.getConnection(
-                "jdbc:oracle:thin:@localhost:1521:mkyong", "username",
-                "password");
-        stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery(query);
+        try {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            connection = DriverManager.getConnection(
+                    "jdbc:oracle:thin:@localhost:1521:mkyong", "username",
+                    "password");
+
+            stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         
         return "<solrAddApi> <fahrenheit></fahrenheit><ftocoutput> </ftocoutput></solrAddApi>";
     }
