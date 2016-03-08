@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Random;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
@@ -65,7 +66,7 @@ public class DBAccessor {
 			innerCount++;
 
 			SolrInputDocument doc = new SolrInputDocument();
-
+			doc.addField("id", randomNum());
 			/**
 			 * At this point, take care of manual document field assignments for
 			 * which you previously assigned the colNames entry to null.
@@ -137,4 +138,10 @@ public class DBAccessor {
 		}
 		return count;
 	}
+
+    private Object randomNum() {
+        Random randomGenerator = new Random();
+        int randomInt = randomGenerator.nextInt(100);
+        return randomInt;
+    }
 }
