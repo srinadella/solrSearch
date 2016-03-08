@@ -11,16 +11,16 @@ import java.util.Collection;
 import java.util.Random;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 
 public class DBAccessor {
 	private static int fetchSize = 1000;
 	private static String url = "http://nadellas.sandbox.gspt.net:7070/solr/products";
-	private static CommonsHttpSolrServer solrCore;
+	private static HttpSolrServer solrCore;
 
 	public DBAccessor() throws MalformedURLException {
-		solrCore = new CommonsHttpSolrServer(url);
+		solrCore = new HttpSolrServer(url);
 	}
 
 	/**
