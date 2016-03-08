@@ -42,7 +42,7 @@ public class DBAccessor {
 		ResultSetMetaData rsm = rs.getMetaData();
 		int numColumns = rsm.getColumnCount();
 		String[] colNames = new String[numColumns + 1];
-
+		solrCore.deleteByQuery( "*:*" );
 		/**
 		 * JDBC numbers the columns starting at 1, so the normal java convention
 		 * of starting at zero won't work.
@@ -114,7 +114,7 @@ public class DBAccessor {
 				}
 			}
 
-			System.out.println("Doc  : " + doc);
+			System.out.println("Input Doc  : " + doc);
 			docs.add(doc);
 
 			/**

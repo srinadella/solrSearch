@@ -7,15 +7,22 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
 
 import net.search.solr.db.DBAccessor;
+import net.search.solr.model.Product;
 
 @Path("/solrAddApi")
 public class SolrSearchAddAPI {
@@ -23,7 +30,26 @@ public class SolrSearchAddAPI {
     @Produces("application/xml")
     public String solrApi() {
         writeJavaBinToSolr();
-        return "<solrAddApi> <fahrenheit></fahrenheit><ftocoutput> </ftocoutput></solrAddApi>";
+
+        List<Product> products;
+        StringBuffer response = new StringBuffer();
+        response.append("<solrAddApi>"); 
+        try {
+            products = querySimpleSolr();
+            Iterator itr = products.iterator();
+            while (itr.hasNext()) {
+                Product product = (Product)itr.next();
+                response.append("<cat_id>" + product.getCatalog_entry_id() + "</cat_id>" );
+                response.append("<title>" + product.getTitle() + "</title>" );
+                response.append("<entry_type>" + product.getEntry_type() + "</entry_type>" );
+                response.append("<shortDescription>" + product.getShort_description() + "</shortDescription>" );
+                response.append("<longDescription>" + product.getLong_description() + "</longDescription>" );
+            }
+            response.append("</solrAddApi>"); 
+        } catch (SolrServerException | IOException e) {
+            e.printStackTrace();
+        }
+        return response.toString();
     }
 
     private void writeJavaBinToSolr() {
@@ -40,6 +66,27 @@ public class SolrSearchAddAPI {
         } catch (SolrServerException e) {
             e.printStackTrace();
         }
+    }
+
+    private static List<Product> querySimpleSolr() throws SolrServerException, IOException {
+        // TODO Auto-generated method stub
+        HttpSolrServer server =
+                new HttpSolrServer("http://nadellas.sandbox.gspt.net:7070/solr/products");
+
+        SolrQuery query = new SolrQuery();
+        query.setQuery("*:*");
+        query.addSort("CATALOG_ENTRY_ID", SolrQuery.ORDER.asc);
+
+        QueryResponse rsp = server.query(query);
+
+        SolrDocumentList docs = rsp.getResults();
+        System.out.println("Docs : " + docs);
+
+        List<Product> beans = rsp.getBeans(Product.class);
+        
+        System.out.println("Beans :  " + beans);
+
+        return beans;
     }
 
     @Path("{f}")
