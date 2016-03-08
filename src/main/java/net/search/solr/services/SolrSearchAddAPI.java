@@ -122,7 +122,7 @@ public class SolrSearchAddAPI {
                         " from catalog_entry ce, store_product sp " +
                         " where sp.store_code='TRUS' and sp.sp_status like 'A%' and sp.product_id = ce.catalog_entry_id " +
                         "and ce.status like 'A%' and" +
-                        " and ce.entry_type = 'P' and rownum < " + num;
+                        " ce.entry_type = 'P' and rownum < " + num;
         Connection connection = null;
         ResultSet rs = null;
         try {
