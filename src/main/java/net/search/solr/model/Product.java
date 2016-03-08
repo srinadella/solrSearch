@@ -3,44 +3,53 @@ package net.search.solr.model;
 import org.apache.solr.client.solrj.beans.Field;
 
 public class Product {
+
     @Field
-    String catalog_entry_id;
+    String id;
     @Field
-    String entry_type;
+    String CATALOG_ENTRY_ID;
     @Field
-    String short_description;
+    String ENTRY_TYPE;
     @Field
-    String long_description;
+    String SHORT_DESCRIPTION;
     @Field
-    String title;
-    public String getCatalog_entry_id() {
-        return catalog_entry_id;
+    String LONG_DESCRIPTION;
+    @Field
+    String TITLE;
+    public String getId() {
+        return id;
     }
-    public void setCatalog_entry_id(String catalog_entry_id) {
-        this.catalog_entry_id = catalog_entry_id;
+    public void setId(String id) {
+        this.id = id;
     }
-    public String getEntry_type() {
-        return entry_type;
+    public String getCATALOG_ENTRY_ID() {
+        return CATALOG_ENTRY_ID;
     }
-    public void setEntry_type(String entry_type) {
-        this.entry_type = entry_type;
+    public void setCATALOG_ENTRY_ID(String cATALOG_ENTRY_ID) {
+        CATALOG_ENTRY_ID = cATALOG_ENTRY_ID;
     }
-    public String getShort_description() {
-        return short_description;
+    public String getENTRY_TYPE() {
+        return ENTRY_TYPE;
     }
-    public void setShort_description(String short_description) {
-        this.short_description = short_description;
+    public void setENTRY_TYPE(String eNTRY_TYPE) {
+        ENTRY_TYPE = eNTRY_TYPE;
     }
-    public String getLong_description() {
-        return long_description;
+    public String getSHORT_DESCRIPTION() {
+        return SHORT_DESCRIPTION;
     }
-    public void setLong_description(String long_description) {
-        this.long_description = long_description;
+    public void setSHORT_DESCRIPTION(String sHORT_DESCRIPTION) {
+        SHORT_DESCRIPTION = sHORT_DESCRIPTION;
     }
-    public String getTitle() {
-        return title;
+    public String getLONG_DESCRIPTION() {
+        return LONG_DESCRIPTION;
     }
-    public void setTitle(String title) {
-        this.title = title;
+    public void setLONG_DESCRIPTION(String lONG_DESCRIPTION) {
+        LONG_DESCRIPTION = lONG_DESCRIPTION;
+    }
+    public String getTITLE() {
+        return TITLE;
+    }
+    public void setTITLE(String tITLE) {
+        TITLE = tITLE;
     }
 }

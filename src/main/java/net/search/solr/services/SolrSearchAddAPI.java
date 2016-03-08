@@ -70,11 +70,12 @@ public class SolrSearchAddAPI {
             Iterator itr = products.iterator();
             while (itr.hasNext()) {
                 Product product = (Product)itr.next();
-                response.append("<cat_id>" + product.getCatalog_entry_id() + "</cat_id>" );
-                response.append("<title>" + product.getTitle() + "</title>" );
-                response.append("<entry_type>" + product.getEntry_type() + "</entry_type>" );
-                response.append("<shortDescription>" + product.getShort_description() + "</shortDescription>" );
-                response.append("<longDescription>" + product.getLong_description() + "</longDescription>" );
+                response.append("<id>" + product.getId() + "</id>" );
+                response.append("<cat_id>" + product.getCATALOG_ENTRY_ID() + "</cat_id>" );
+                response.append("<title>" + product.getTITLE() + "</title>" );
+                response.append("<entry_type>" + product.getENTRY_TYPE() + "</entry_type>" );
+                response.append("<shortDescription>" + product.getSHORT_DESCRIPTION() + "</shortDescription>" );
+                response.append("<longDescription>" + product.getLONG_DESCRIPTION() + "</longDescription>" );
             }
             response.append("</solrAddApi>"); 
         } catch (SolrServerException | IOException e) {
@@ -99,6 +100,16 @@ public class SolrSearchAddAPI {
 
         List<Product> beans = rsp.getBeans(Product.class);
         
+        Iterator itr = beans.iterator();
+        while (itr.hasNext()) {
+            Product product = (Product)itr.next();
+            System.out.println("<id>" + product.getId() + "</id>" );
+            System.out.println("<cat_id>" + product.getCATALOG_ENTRY_ID() + "</cat_id>" );
+            System.out.println("<title>" + product.getTITLE() + "</title>" );
+            System.out.println("<entry_type>" + product.getENTRY_TYPE() + "</entry_type>" );
+            System.out.println("<shortDescription>" + product.getSHORT_DESCRIPTION() + "</shortDescription>" );
+            System.out.println("<longDescription>" + product.getLONG_DESCRIPTION() + "</longDescription>" );
+        }
         System.out.println("Beans :  " + beans);
 
         return beans;
@@ -109,8 +120,9 @@ public class SolrSearchAddAPI {
         String query =
                 "select ce.catalog_entry_id, ce.entry_type, ce.short_description, ce.long_description,ce.title " +
                         " from catalog_entry ce, store_product sp " +
-                        " where sp.store_code='TRUS' and sp.sp_status like 'A%' and sp.product_id = ce.catalog_entry_id and ce.status like 'A%' and" +
-                        " rownum < " + num;
+                        " where sp.store_code='TRUS' and sp.sp_status like 'A%' and sp.product_id = ce.catalog_entry_id " +
+                        "and ce.status like 'A%' and" +
+                        " and ce.entry_type = 'P' and rownum < " + num;
         Connection connection = null;
         ResultSet rs = null;
         try {
