@@ -7,19 +7,16 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Iterator;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Random;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 
 import net.search.solr.db.DBAccessor;
 import net.search.solr.model.Product;
@@ -30,25 +27,23 @@ public class SolrSearchAddAPI {
     @Produces("application/xml")
     public String solrApi() {
         writeJavaBinToSolr(10);
-
-        StringBuffer response = buildResponse();
-        return response.toString();
+        return "<Results>OK</Results>";
     }
+
     @Path("{num}")
     @GET
     @Produces("application/xml")
     public String solrApi(@PathParam("num") int num) {
         writeJavaBinToSolr(num);
-
-        StringBuffer response = buildResponse();
-        return response.toString();
+        return "<Results> <Updated></Updated></Results>";
     }
 
     private void writeJavaBinToSolr(int num) {
         try {
             ResultSet rs = getResultSets(num);
-            DBAccessor accessor = new DBAccessor();
-            accessor.addResultSet(rs);
+             DBAccessor accessor = new DBAccessor();
+             accessor.addResultSet(rs);
+//            addResultSetAsBean(rs);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -60,65 +55,48 @@ public class SolrSearchAddAPI {
         }
     }
 
+    private void addResultSetAsBean(ResultSet rs)
+        throws SolrServerException, IOException, SQLException {
 
-    private StringBuffer buildResponse() {
-        List<Product> products;
-        StringBuffer response = new StringBuffer();
-        response.append("<solrAddApi>"); 
-        try {
-            products = querySimpleSolr();
-            Iterator itr = products.iterator();
-            while (itr.hasNext()) {
-                Product product = (Product)itr.next();
-                response.append("<id>" + product.getId() + "</id>" );
-                response.append("<cat_id>" + product.getCATALOG_ENTRY_ID() + "</cat_id>" );
-                response.append("<title>" + product.getTITLE() + "</title>" );
-                response.append("<entry_type>" + product.getENTRY_TYPE() + "</entry_type>" );
-                response.append("<shortDescription>" + product.getSHORT_DESCRIPTION() + "</shortDescription>" );
-                response.append("<longDescription>" + product.getLONG_DESCRIPTION() + "</longDescription>" );
-            }
-            response.append("</solrAddApi>"); 
-        } catch (SolrServerException | IOException e) {
-            e.printStackTrace();
+        HttpSolrClient solrCore =
+                new HttpSolrClient("http://nadellas.sandbox.gspt.net:7070/solr/products");
+
+        solrCore.deleteByQuery("*:*");
+
+        Product prod = new Product();
+
+        prod.setId(randomId());
+        ArrayList<Product> prodList = new ArrayList<Product>();
+        while (rs.next()) {
+            
+            prod.setCATALOG_ENTRY_ID(rs.getString("catalog_entry_id"));
+            prod.setENTRY_TYPE(rs.getString("entry_type"));
+            prod.setLONG_DESCRIPTION(rs.getString("long_description"));
+            prod.setSHORT_DESCRIPTION(rs.getString("short_description"));
+            prod.setTITLE(rs.getString("title"));
+            System.out.println("Commiting Catalog_Entry_Id : " + prod.getCATALOG_ENTRY_ID());
+            solrCore.addBean(prod);
+            solrCore.commit();
         }
-        return response;
+        
+//        solrCore.addBeans(prodList);
+        
+//        solrCore.commit();
+        
+        System.out.println("Done Commiting to Core : " + prodList.size() + " : Docs");
     }
 
-    private static List<Product> querySimpleSolr() throws SolrServerException, IOException {
-        // TODO Auto-generated method stub
-        HttpSolrServer server =
-                new HttpSolrServer("http://nadellas.sandbox.gspt.net:7070/solr/products");
-
-        SolrQuery query = new SolrQuery();
-        query.setQuery("*:*");
-        query.addSort("CATALOG_ENTRY_ID", SolrQuery.ORDER.asc);
-
-        QueryResponse rsp = server.query(query);
-
-        SolrDocumentList docs = rsp.getResults();
-        System.out.println("Docs : " + docs);
-
-        List<Product> beans = rsp.getBeans(Product.class);
-        
-        Iterator itr = beans.iterator();
-        while (itr.hasNext()) {
-            Product product = (Product)itr.next();
-            System.out.println("<id>" + product.getId() + "</id>" );
-            System.out.println("<cat_id>" + product.getCATALOG_ENTRY_ID() + "</cat_id>" );
-            System.out.println("<title>" + product.getTITLE() + "</title>" );
-            System.out.println("<entry_type>" + product.getENTRY_TYPE() + "</entry_type>" );
-            System.out.println("<shortDescription>" + product.getSHORT_DESCRIPTION() + "</shortDescription>" );
-            System.out.println("<longDescription>" + product.getLONG_DESCRIPTION() + "</longDescription>" );
-        }
-        System.out.println("Beans :  " + beans);
-
-        return beans;
+    private String randomId() {
+        Random randomGenerator = new Random();
+        int randomInt = randomGenerator.nextInt(100);
+        Integer id = new Integer(randomInt);
+        return id.toString();
     }
 
     private ResultSet getResultSets(int num) {
         Statement stmt = null;
         String query =
-                "select ce.catalog_entry_id, ce.entry_type, ce.short_description, ce.long_description,ce.title " +
+                "select ce.catalog_entry_id, ce.entry_type, ce.title " +
                         " from catalog_entry ce, store_product sp " +
                         " where sp.store_code='TRUS' and sp.sp_status like 'A%' and sp.product_id = ce.catalog_entry_id " +
                         "and ce.status like 'A%' and" +
